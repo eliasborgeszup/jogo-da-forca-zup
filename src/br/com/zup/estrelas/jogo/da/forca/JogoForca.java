@@ -156,8 +156,8 @@ public class JogoForca {
 		return contadorQuantidadeErros;
 	}
 
-	public static int calculaQuantidadeTentativas(int quantidadeErros, int contadorQuantidadeErros) {
-		if (contadorQuantidadeErros == 0 && quantidadeErros < QUANTIDADE_TENTATIVAS) {
+	public static int calculaQuantidadeTentativas(int quantidadeErros, int contadorLetraCerta) {
+		if (contadorLetraCerta == 0 && quantidadeErros < QUANTIDADE_TENTATIVAS) {
 			quantidadeErros++;
 
 			int somaQuantidadeTentativasRestantes = QUANTIDADE_TENTATIVAS - quantidadeErros;
@@ -336,14 +336,16 @@ public class JogoForca {
 			System.out.print("\nDigite uma letra:");
 			letraDigitada = teclado.next().charAt(0);
 
-			int contadorQuantidadeErros = verificaLetraDigitada(palavraAlvo, letraDigitada, controladorPalavra);
+			int contadorLetraCerta = verificaLetraDigitada(palavraAlvo, letraDigitada, controladorPalavra);
 
 			if (!verificarLetraJaDigitada(guardarLetrasDigitadas, letraDigitada)) {
 				if (verificarExistenciaCaractereInvalido(Character.toString(letraDigitada))) {
-					quantidadeErros = calculaQuantidadeTentativas(quantidadeErros, contadorQuantidadeErros);
+					quantidadeErros = calculaQuantidadeTentativas(quantidadeErros, contadorLetraCerta);
 				} else {
 					System.out.println(LETRA_INVALIDA);
 				}
+			} else {
+				System.out.printf("Letra [%s] já foi digitada\n\n", letraDigitada);
 			}
 
 		} while (quantidadeErros < QUANTIDADE_TENTATIVAS);
