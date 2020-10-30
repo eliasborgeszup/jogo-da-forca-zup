@@ -53,12 +53,10 @@ public class JogoForca {
 	}
 
 	public static void criarArquivo() {
-		String palavras = PALAVRAS_ESTRELAS;
-
 		try {
 			FileWriter writer = new FileWriter(NOME_DUCUMENTO_TEXTO);
 
-			writer.write(palavras);
+			writer.write(PALAVRAS_ESTRELAS);
 
 			System.out.printf("%s criado com sucesso!\n", NOME_DUCUMENTO_TEXTO);
 			writer.close();
@@ -67,13 +65,10 @@ public class JogoForca {
 		}
 	}
 
-	/*
-	 * Ler arquivo de palavras, chamando outros metodos para pegar quantidade de
-	 * linhas existentes no arquivo e sortear esta linha e retornar ela
-	 */
 	public static String buscarPalavraSorteada() {
 		String linha = null;
-
+		
+		//TODO: Criar metodos claros para deixar try mais limpo
 		try {
 			int quantidadeLinhasArquivo = buscarQuantidadeLinhasArquivo();
 			int contadorLinhaSorteada = 0, linhaSorteada = sortearLinhaDoArquivo(quantidadeLinhasArquivo);
@@ -99,7 +94,6 @@ public class JogoForca {
 		return linha;
 	}
 
-	// Metodo para buscar a quantidade de linhas existentes em um arquivo txt
 	public static int buscarQuantidadeLinhasArquivo() {
 		int quantidadeLinhas = 0;
 
@@ -124,7 +118,7 @@ public class JogoForca {
 		return new Random().nextInt(quantidadeLinhas);
 	}
 
-	// Metodo para criação de estrutura da forca de acordo com a palavra alvo
+	// TODO: Encontrar nomes de constantes que representa 0, 1 e 2 respectivamente
 	public static void estruturaForca(String palavraAlvo, char[] controladorPalavra) {
 		for (int i = 0; i < palavraAlvo.length(); i++) {
 			if (palavraAlvo.charAt(i) == ' ') {
@@ -141,11 +135,6 @@ public class JogoForca {
 		}
 	}
 
-	/*
-	 * Faz uma verificação da letra digitada, compara com letras acentuadas,
-	 * minusculas e maiusculas e retorna uma variavel que ajuda em outra função
-	 * (calculaQuantidadeTentativas) na contagem de erros, caso
-	 */
 	public static int verificaLetraDigitada(String palavraSorteada, char letraDigitada, char[] controladorPalavra) {
 		Collator collator = Collator.getInstance(new Locale("pt", "BR"));
 		collator.setStrength(Collator.PRIMARY);
@@ -167,23 +156,19 @@ public class JogoForca {
 		return contadorQuantidadeErros;
 	}
 
-	/*
-	 * Verifica se a letra digitada foi errada ou verdadeira e retorna a quantidade
-	 * de chances que ainda possui
-	 */
 	public static int calculaQuantidadeTentativas(int quantidadeErros, int contadorQuantidadeErros) {
-		int quantidadeTentativas = 6;
-
-		if (contadorQuantidadeErros == 0 && quantidadeErros < quantidadeTentativas) {
+		if (contadorQuantidadeErros == 0 && quantidadeErros < QUANTIDADE_TENTATIVAS) {
 			quantidadeErros++;
-			System.out.printf("Ops.. Letra errada, %d / %d tentiva(s)\n", quantidadeTentativas,
-					quantidadeTentativas - quantidadeErros);
+
+			int somaQuantidadeTentativasRestantes = QUANTIDADE_TENTATIVAS - quantidadeErros;
+
+			System.out.printf("Ops.. Letra errada, %d / %d tentiva(s)\n", QUANTIDADE_TENTATIVAS,
+					somaQuantidadeTentativasRestantes);
 		}
 
 		return quantidadeErros;
 	}
 
-	// Verifica se letra digitada já foi digitada anteriormente
 	public static boolean verificarLetraJaDigitada(char[] letrasDigitadas, char letraDigitada) {
 		Collator collator = Collator.getInstance(new Locale("pt", "BR"));
 		collator.setStrength(Collator.PRIMARY);
@@ -202,7 +187,6 @@ public class JogoForca {
 		return false;
 	}
 
-	// Faz impressao do array guardarLetrasDigitadas
 	public static void imprimirLetrasDigitadas(char[] guardarLetrasDigitadas) {
 		System.out.print("\n\nLetras digitadas:");
 		for (int i = 0; i < guardarLetrasDigitadas.length; i++) {
@@ -210,16 +194,15 @@ public class JogoForca {
 		}
 	}
 
-	// Verifica se a palavra já foi completada
 	public static boolean verificaConclusaoPalavra(String palavraAlvo, char[] controladorPalavra) {
 		int contadorLetrasAcertada = 0;
 
 		for (int i = 0; i < palavraAlvo.length(); i++) {
 			boolean letraDigitada = controladorPalavra[i] == 1;
 			boolean espacoPalavra = controladorPalavra[i] == 2;
-			boolean verificaLetrasConcluida = letraDigitada || espacoPalavra;
+			boolean verificaLetrasCompletadas = letraDigitada || espacoPalavra;
 
-			if (verificaLetrasConcluida) {
+			if (verificaLetrasCompletadas) {
 				contadorLetrasAcertada++;
 			}
 		}
@@ -232,8 +215,6 @@ public class JogoForca {
 
 		return false;
 	}
-
-	// Adiciona um texto em nomeDocumentoTexto caso consiga completar a palavra
 
 	public static void adicionarTexto() throws IOException {
 		Scanner teclado = new Scanner(System.in);
@@ -251,25 +232,28 @@ public class JogoForca {
 			palavraDigitada = teclado.nextLine();
 		}
 
+		teclado.close();
+
 		try {
-			FileWriter writer = new FileWriter(NOME_DUCUMENTO_TEXTO, true);
+			adicionarPalavraArquivo(palavraDigitada);
 
-			writer.append("\n" + palavraDigitada);
-
-			writer.close();
-			teclado.close();
 			System.out.printf("\n\nPalavra %s salva com sucesso! \n\n", palavraDigitada);
+
 			System.out.println(MENSAGEM_AGRADECIMENTO);
 		} catch (IOException e) {
 			System.out.println(e.getMessage());
 		}
 	}
-	
 
-	/*
-	 * Verifica se possui aquela palavra no documento, caso possui pede para digitar
-	 * outra
-	 */
+	public static void adicionarPalavraArquivo(String palavraDigitada) throws IOException {
+		FileWriter writer = new FileWriter(NOME_DUCUMENTO_TEXTO, true);
+
+		writer.append("\n" + palavraDigitada);
+
+		writer.close();
+	}
+
+	//TODO: Realizar tratamento de excesão, alterar nome de variaveis auxiliares
 	public static boolean verificarExistenciaDaPalavraNoDocumento(String palavraDigitada) throws IOException {
 
 		if (!verificarExistenciaCaractereInvalido(palavraDigitada)) {

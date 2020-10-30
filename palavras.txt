@@ -16,5 +16,3 @@ Função
 Vetor
 Regex
 Collator
-Abobora
-Grazi
